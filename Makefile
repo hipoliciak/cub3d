@@ -3,23 +3,30 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: piotr <piotr@student.42.fr>                +#+  +:+       +#+         #
+#    By: dmodrzej <dmodrzej@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/30 23:20:11 by dmodrzej          #+#    #+#              #
-#    Updated: 2024/11/11 13:32:00 by piotr            ###   ########.fr        #
+#    Updated: 2024/12/08 16:44:27 by dmodrzej         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME	=	cub3D
+NAME	=	cub3d
 
 # compiler
 CC		=	cc
-# FLAGS	=	-g -Wall -Wextra -Werror
-FLAGS	=	-g 
+FLAGS	=	-g -Wall -Wextra -Werror
 
 # sources
 SRC_DIR =	srcs/
-SRC		=	main.c init.c map.c engine.c graphics.c end.c utils.c
+SRC		=	main.c check_args.c check_map_borders.c \
+			check_map.c check_textures.c create_game_map.c \
+			error.c exit.c fill_color_textures.c \
+			free_data.c get_file_data.c image_utils.c \
+			init_data.c init_mlx.c init_textures.c \
+			input_handler.c minimap_image.c minimap_render.c \
+			parse_data.c parsing_utils.c player_dir.c \
+			player_move.c player_pos.c player_rotate.c \
+			raycasting.c render.c texture.c
 SRCS	=	$(addprefix $(SRC_DIR), $(SRC))
 
 # objects
