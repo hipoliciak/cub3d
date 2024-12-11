@@ -3,37 +3,60 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dmodrzej <dmodrzej@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/09 22:44:18 by alexa             #+#    #+#             */
-/*   Updated: 2024/12/08 17:04:50 by dmodrzej         ###   ########.fr       */
+/*   Created: 2024/12/10 21:08:52 by dmodrzej          #+#    #+#             */
+/*   Updated: 2024/12/11 00:39:50 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static void	print_controls(void)
+static int	key_press_handler(int key, t_data *data)
 {
-	printf(CYAN "\n");
-	printf("░█▀▀░█░█░█▀▄░▀▀█░█▀▄░░░█▀▀░█▀█░█▀█░▀█▀░█▀▄░█▀█░█░░░█▀▀\n");
-	printf("░█░░░█░█░█▀▄░░▀▄░█░█░░░█░░░█░█░█░█░░█░░█▀▄░█░█░█░░░▀▀█\n");
-	printf("░▀▀▀░▀▀▀░▀▀░░▀▀░░▀▀░░░░▀▀▀░▀▀▀░▀░▀░░▀░░▀░▀░▀▀▀░▀▀▀░▀▀▀\n");
-	printf(RESET "\n");
-	printf(CYAN "\tW" RESET ": move forward\t");
-	printf(CYAN "\tS" RESET ": move backward\n");
-	printf(CYAN "\tA" RESET ": strafe left\t");
-	printf(CYAN "\tD" RESET ": strafe right\n");
-	printf(CYAN "\t<" RESET ": rotate left\t");
-	printf(CYAN "\t>" RESET ": rotate right\n");
-	if (BONUS)
-		printf(CYAN "\tMouse" RESET ": rotate view\n");
-	printf("\n");
+	if (key == CLOSE_BTN || key == KEY_ESC || key == KEY_Q)
+		quit_cub3d(data);
+	if (key == KEY_AR_L)
+		data->player.rotate -= 1;
+	if (key == KEY_AR_R)
+		data->player.rotate += 1;
+	if (key == KEY_W)
+		data->player.move_y = 1;
+	if (key == KEY_A)
+		data->player.move_x = -1;
+	if (key == KEY_S)
+		data->player.move_y = -1;
+	if (key == KEY_D)
+		data->player.move_x = 1;
+	return (0);
+}
+
+static int	key_release_handler(int key, t_data *data)
+{
+	if (key == CLOSE_BTN || key == KEY_ESC || key == KEY_Q)
+		quit_cub3d(data);
+	if (key == KEY_W && data->player.move_y == 1)
+		data->player.move_y = 0;
+	if (key == KEY_S && data->player.move_y == -1)
+		data->player.move_y = 0;
+	if (key == KEY_A && data->player.move_x == -1)
+		data->player.move_x += 1;
+	if (key == KEY_D && data->player.move_x == 1)
+		data->player.move_x -= 1;
+	if (key == KEY_AR_L && data->player.rotate <= 1)
+		data->player.rotate = 0;
+	if (key == KEY_AR_R && data->player.rotate >= -1)
+		data->player.rotate = 0;
+	return (0);
 }
 
 static int	parse_args(t_data *data, char **av)
 {
-	if (check_file(av[1], true) == FAILURE)
-		clean_exit(data, FAILURE);
+	if (!is_cub_file(av[1]))
+	{
+		err_msg(av[1], ERR_FILE_NOT_CUB, 1);
+		return (1);
+	}
 	parse_data(av[1], data);
 	if (get_file_data(data, data->mapinfo.file) == FAILURE)
 		return (free_data(data));
@@ -42,8 +65,6 @@ static int	parse_args(t_data *data, char **av)
 	if (check_textures_validity(data, &data->texinfo) == FAILURE)
 		return (free_data(data));
 	init_player_direction(data);
-	if (DEBUG_MSG)
-		debug_display_data(data);
 	return (0);
 }
 
@@ -58,9 +79,11 @@ int	main(int ac, char **av)
 		return (1);
 	init_mlx(&data);
 	init_textures(&data);
-	print_controls();
-	render_images(&data);
-	listen_for_input(&data);
+	render_raycast(&data);
+	// render(&data);
+	mlx_hook(data.win, KEY_PRESS, KEY_PRESS_MASK, key_press_handler, &data);
+	mlx_hook(data.win, KEY_RELEASE, KEY_RELEASE_MASK, key_release_handler, &data);
+	mlx_hook(data.win, CLOSE_BTN, NO_EVENT_MASK, quit_cub3d, &data);
 	mlx_loop_hook(data.mlx, render, &data);
 	mlx_loop(data.mlx);
 	return (0);

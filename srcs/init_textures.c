@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_textures.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dmodrzej <dmodrzej@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/09 11:34:03 by mcombeau          #+#    #+#             */
-/*   Updated: 2024/12/08 17:05:34 by dmodrzej         ###   ########.fr       */
+/*   Created: 2024/12/10 21:08:36 by dmodrzej          #+#    #+#             */
+/*   Updated: 2024/12/10 22:52:35 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,7 @@ static int	*xpm_to_img(t_data *data, char *path)
 	int		y;
 
 	init_texture_img(data, &tmp, path);
-	// buffer = ft_calloc(1,
-	// 		sizeof * buffer * data->texinfo.size * data->texinfo.size);
-	buffer = calloc(1, sizeof * buffer * data->texinfo.size * data->texinfo.size);
+	buffer = ft_calloc(1, sizeof * buffer * data->texinfo.size * data->texinfo.size);
 	if (!buffer)
 		clean_exit(data, err_msg(NULL, ERR_MALLOC, 1));
 	y = 0;

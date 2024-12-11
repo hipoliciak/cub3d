@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_data.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dmodrzej <dmodrzej@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/09 22:30:28 by alexa             #+#    #+#             */
-/*   Updated: 2024/12/08 17:23:00 by dmodrzej         ###   ########.fr       */
+/*   Created: 2024/12/10 21:09:24 by dmodrzej          #+#    #+#             */
+/*   Updated: 2024/12/10 22:50:41 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,7 @@ static void	fill_tab(int row, int column, int i, t_data *data)
 	line = get_next_line(data->mapinfo.fd);
 	while (line != NULL)
 	{
-		// data->mapinfo.file[row] = ft_calloc(ft_strlen(line) + 1, sizeof(char));
-		data->mapinfo.file[row] = calloc(ft_strlen(line) + 1, sizeof(char));
+		data->mapinfo.file[row] = ft_calloc(ft_strlen(line) + 1, sizeof(char));
 		if (!data->mapinfo.file[row])
 		{
 			err_msg(NULL, ERR_MALLOC, 0);
@@ -72,9 +71,7 @@ void	parse_data(char *path, t_data *data)
 	column = 0;
 	data->mapinfo.line_count = get_number_of_lines(path);
 	data->mapinfo.path = path;
-	// data->mapinfo.file = ft_calloc(data->mapinfo.line_count \
-	// 		+ 1, sizeof(char *));
-	data->mapinfo.file = calloc(data->mapinfo.line_count + 1, sizeof(char *));
+	data->mapinfo.file = ft_calloc(data->mapinfo.line_count + 1, sizeof(char *));
 	if (!(data->mapinfo.file))
 	{
 		err_msg(NULL, ERR_MALLOC, 0);

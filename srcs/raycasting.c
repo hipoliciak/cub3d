@@ -3,22 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   raycasting.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alexa <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/09 22:40:40 by alexa             #+#    #+#             */
-/*   Updated: 2023/02/09 22:40:41 by alexa            ###   ########.fr       */
+/*   Created: 2024/12/10 21:10:19 by dmodrzej          #+#    #+#             */
+/*   Updated: 2024/12/10 21:10:21 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-/*
-We initialize the set up for the rays
-- camera_x -> Where is the camera (-1 = left, 0 = center, 1 = right)
-- dir_x/y = direction of the ray
-- map_x/y = current square of the ray
-- deltadist_x/y = distance to go to the next x or y.
-*/
 
 static void	init_raycasting_info(int x, t_ray *ray, t_player *player)
 {
@@ -31,15 +23,6 @@ static void	init_raycasting_info(int x, t_ray *ray, t_player *player)
 	ray->deltadist_x = fabs(1 / ray->dir_x);
 	ray->deltadist_y = fabs(1 / ray->dir_y);
 }
-
-/*
-- We are doing the initial set up for the dda
-- dda algorithm will jump one square in each loop eiter in a x or y direction
-- ray->sidedist_x or y = distance from the ray start position to the
-	next x or y position
-- if x or y < 0 go the next x or y to the left
-- if x or y > 0 go the next x or y to the right
-*/
 
 static void	set_dda(t_ray *ray, t_player *player)
 {
@@ -64,12 +47,6 @@ static void	set_dda(t_ray *ray, t_player *player)
 		ray->sidedist_y = (ray->map_y + 1.0 - player->pos_y) * ray->deltadist_y;
 	}
 }
-
-/*
-- We implement the DDA algorithm -> the loop will increment 1 square 
--   until we hit a wall
-- If the sidedistx < sidedisty, x is the closest point from the ray
-*/
 
 static void	perform_dda(t_data *data, t_ray *ray)
 {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_mlx.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mcombeau <mcombeau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/09 11:33:53 by mcombeau          #+#    #+#             */
-/*   Updated: 2023/02/11 11:43:16 by mcombeau         ###   ########.fr       */
+/*   Created: 2024/12/10 21:08:28 by dmodrzej          #+#    #+#             */
+/*   Updated: 2024/12/10 21:47:33 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,5 @@ void	init_mlx(t_data *data)
 	data->win = mlx_new_window(data->mlx, WIN_WIDTH, WIN_HEIGHT, "Cub3D");
 	if (!data->win)
 		clean_exit(data, err_msg("mlx", ERR_MLX_WIN, 1));
-	if (BONUS)
-		mlx_mouse_move(data->mlx, data->win, data->win_width / 2,
-			data->win_height / 2);
 	return ;
 }

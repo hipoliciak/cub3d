@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_map.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alexa <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/09 22:18:24 by alexa             #+#    #+#             */
-/*   Updated: 2023/02/09 22:18:28 by alexa            ###   ########.fr       */
+/*   Created: 2024/12/10 21:06:57 by dmodrzej          #+#    #+#             */
+/*   Updated: 2024/12/11 01:32:23 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,10 @@ static int	check_map_elements(t_data *data, char **map_tab)
 		j = 0;
 		while (map_tab[i][j])
 		{
-			while (data->map[i][j] == ' ' || data->map[i][j] == '\t'
-			|| data->map[i][j] == '\r'
-			|| data->map[i][j] == '\v' || data->map[i][j] == '\f')
+			// while (data->map[i][j] == ' ' || data->map[i][j] == '\t'
+			// || data->map[i][j] == '\r'
+			// || data->map[i][j] == '\v' || data->map[i][j] == '\f')
+			while (ft_isspace_not_nl(map_tab[i][j]))
 				j++;
 			if (!(ft_strchr("10NSEW", map_tab[i][j])))
 				return (err_msg(data->mapinfo.path, ERR_INV_LETTER, FAILURE));
@@ -50,10 +51,14 @@ static int	check_position_is_valid(t_data *data, char **map_tab)
 	j = (int)data->player.pos_x;
 	if (ft_strlen(map_tab[i - 1]) < (size_t)j
 		|| ft_strlen(map_tab[i + 1]) < (size_t)j
-		|| is_a_white_space(map_tab[i][j - 1]) == SUCCESS
-		|| is_a_white_space(map_tab[i][j + 1]) == SUCCESS
-		|| is_a_white_space(map_tab[i - 1][j]) == SUCCESS
-		|| is_a_white_space(map_tab[i + 1][j]) == SUCCESS)
+		|| ft_isspace(map_tab[i][j - 1])
+		|| ft_isspace(map_tab[i][j + 1])
+		|| ft_isspace(map_tab[i - 1][j])
+		|| ft_isspace(map_tab[i + 1][j]))
+		// || is_a_white_space(map_tab[i][j - 1]) == SUCCESS
+		// || is_a_white_space(map_tab[i][j + 1]) == SUCCESS
+		// || is_a_white_space(map_tab[i - 1][j]) == SUCCESS
+		// || is_a_white_space(map_tab[i + 1][j]) == SUCCESS)
 		return (FAILURE);
 	return (SUCCESS);
 }
@@ -97,9 +102,11 @@ static int	check_map_is_at_the_end(t_mapinfo *map)
 		j = 0;
 		while (map->file[i][j])
 		{
-			if (map->file[i][j] != ' ' && map->file[i][j] != '\t'
-				&& map->file[i][j] != '\r' && map->file[i][j] != '\n'
-				&& map->file[i][j] != '\v' && map->file[i][j] != '\f')
+			// if (map->file[i][j] != ' ' && map->file[i][j] != '\t'
+			// 	&& map->file[i][j] != '\r' && map->file[i][j] != '\n'
+			// 	&& map->file[i][j] != '\v' && map->file[i][j] != '\f')
+			// 	return (FAILURE);
+			if (ft_isspace(map->file[i][j]))
 				return (FAILURE);
 			j++;
 		}

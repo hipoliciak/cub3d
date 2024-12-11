@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: dmodrzej <dmodrzej@student.42.fr>          +#+  +:+       +#+         #
+#    By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/30 23:20:11 by dmodrzej          #+#    #+#              #
-#    Updated: 2024/12/08 16:44:27 by dmodrzej         ###   ########.fr        #
+#    Updated: 2024/12/11 01:08:33 by dmodrzej         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,12 +20,11 @@ FLAGS	=	-g -Wall -Wextra -Werror
 SRC_DIR =	srcs/
 SRC		=	main.c check_args.c check_map_borders.c \
 			check_map.c check_textures.c create_game_map.c \
-			error.c exit.c fill_color_textures.c \
-			free_data.c get_file_data.c image_utils.c \
+			exit.c fill_color_textures.c \
+			free_data.c get_file_data.c \
 			init_data.c init_mlx.c init_textures.c \
-			input_handler.c minimap_image.c minimap_render.c \
-			parse_data.c parsing_utils.c player_dir.c \
-			player_move.c player_pos.c player_rotate.c \
+			parse_data.c utils.c init_player.c \
+			player_move.c player_move_utils.c \
 			raycasting.c render.c texture.c
 SRCS	=	$(addprefix $(SRC_DIR), $(SRC))
 

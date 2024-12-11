@@ -3,73 +3,40 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dmodrzej <dmodrzej@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/09 22:47:42 by alexa             #+#    #+#             */
-/*   Updated: 2024/12/08 18:00:11 by dmodrzej         ###   ########.fr       */
+/*   Created: 2024/12/10 21:10:55 by dmodrzej          #+#    #+#             */
+/*   Updated: 2024/12/11 01:40:15 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB3D_H
 # define CUB3D_H
 
-# include "colors.h"
+# include "key_linux.h"
 # include "libft.h"
+# include "ft_printf.h"
 # include "mlx.h"
 # include <errno.h>
 # include <fcntl.h>
 # include <math.h>
-# include <stdbool.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <unistd.h>
-# include <X11/keysym.h>
-# include <X11/X.h>
 
-/* ---------------------------------------------------------------------------*
-							MACROS
- --------------------------------------------------------------------------- */
+// Macros
 
-# ifndef DEBUG_MSG
-#  define DEBUG_MSG 0
-# endif
-
-# ifndef MMAP_DEBUG_MSG
-#  define MMAP_DEBUG_MSG 0
-# endif
-
-# ifndef BONUS
-#  define BONUS 1
-# endif
-
-/* # define WIN_WIDTH 960 */
-/* # define WIN_HEIGHT 720 */
-# define WIN_WIDTH 800
-# define WIN_HEIGHT 600
-
+# define WIN_WIDTH 1200
+# define WIN_HEIGHT 800
 # define TEX_SIZE 64
-
-# ifndef O_DIRECTORY
-#  define O_DIRECTORY 00200000
-# endif
-
 # define MOVESPEED 0.0125
 # define ROTSPEED 0.015
 
-# define DIST_EDGE_MOUSE_WRAP 20
+// Errors
 
-/* MINIMAP MACROS */
-# define MMAP_PIXEL_SIZE 128
-# define MMAP_VIEW_DIST 4
-# define MMAP_COLOR_PLAYER 0x00FF00
-# define MMAP_COLOR_WALL 0x808080
-# define MMAP_COLOR_FLOOR 0xE6E6E6
-# define MMAP_COLOR_SPACE 0x404040
-
-// ERROR MESSAGES
 # define ERR_USAGE "usage: ./cub3d <path/to/map.cub>"
 
 # define ERR_FILE_NOT_CUB "Not a .cub file"
@@ -113,11 +80,7 @@ enum e_texture_index
 	WEST = 3
 };
 
-typedef unsigned long	t_ulong;
-
-/* ---------------------------------------------------------------------------*
-							STRUCTURES
- --------------------------------------------------------------------------- */
+// Structures
 
 typedef struct s_img
 {
@@ -145,17 +108,6 @@ typedef struct s_texinfo
 	int				x;
 	int				y;
 }	t_texinfo;
-
-typedef struct s_minimap
-{
-	char	**map;
-	t_img	*img;
-	int		size;
-	int		offset_x;
-	int		offset_y;
-	int		view_dist;
-	int		tile_size;
-}	t_minimap;
 
 typedef struct s_mapinfo
 {
@@ -220,9 +172,7 @@ typedef struct s_data
 	t_img		minimap;
 }	t_data;
 
-/* ---------------------------------------------------------------------------*
-							FUNCTIONS
- --------------------------------------------------------------------------- */
+// Prototypes
 
 /* init/init_data.c */
 void	init_data(t_data *data);
@@ -237,9 +187,6 @@ void	init_texture_img(t_data *data, t_img *image, char *path);
 /* init/init_textures.c */
 void	init_textures(t_data *data);
 void	init_texinfo(t_texinfo *textures);
-
-/* parsing/check_args.c */
-int		check_file(char *arg, bool cub);
 
 /* parsing/parse_data.c */
 void	parse_data(char *path, t_data *data);
@@ -269,7 +216,7 @@ size_t	find_biggest_len(t_mapinfo *map, int i);
 
 /* render/render.c */
 int		render(t_data *data);
-void	render_images(t_data *data);
+void	render_raycast(t_data *data);
 
 /* render/raycasting.c */
 int		raycasting(t_player *player, t_data *data);
@@ -278,29 +225,8 @@ int		raycasting(t_player *player, t_data *data);
 void	init_texture_pixels(t_data *data);
 void	update_texture_pixels(t_data *data, t_texinfo *tex, t_ray *ray, int x);
 
-/* render/image_utils.c */
-void	set_image_pixel(t_img *image, int x, int y, int color);
-
-/* render/minimap_render.c */
-void	render_minimap(t_data *data);
-
-/* render/minimap_image.c */
-void	render_minimap_image(t_data *data, t_minimap *minimap);
-
-/* movement/input_handler.c */
-void	listen_for_input(t_data *data);
-
 /* movement/player_dir.c */
 void	init_player_direction(t_data *data);
-
-/* movement/player_pos.c */
-int		validate_move(t_data *data, double new_x, double new_y);
-
-/* movement/player_move.c */
-int		move_player(t_data *data);
-
-/* movement/player_rotate.c */
-int		rotate_player(t_data *data, double rotdir);
 
 /* exit/exit.c */
 void	clean_exit(t_data *data, int code);
@@ -310,14 +236,25 @@ int		quit_cub3d(t_data *data);
 void	free_tab(void **tab);
 int		free_data(t_data *data);
 
-/* error.c */
-int		err_msg(char *detail, char *str, int code);
-int		err_msg_val(int detail, char *str, int code);
+int		is_cub_file(char *arg);
+int		is_xpm_file(char *arg);
 
-/* debug/debug.c */
-void	debug_display_data(t_data *data);
-void	debug_display_minimap(t_minimap *minimap);
-void	debug_display_player(t_data *data);
-void	debug_print_char_tab(char **tab);
+void	render_frame(t_data *data);
+
+// Movement
+int		move_player(t_data *data);
+int		move_forward(t_data *data);
+int		move_backward(t_data *data);
+int		move_left(t_data *data);
+int		move_right(t_data *data);
+int		rotate(t_data *data, double rotdir);
+int		validate_move(t_data *data, double new_x, double new_y);
+
+// Utils
+size_t	find_biggest_len(t_mapinfo *map, int i);
+void	*ft_calloc(size_t count, size_t size);
+int		err_msg(char *detail, char *str, int code);
+int		ft_isspace(int c);
+int		ft_isspace_not_nl(int c);
 
 #endif

@@ -3,47 +3,45 @@
 /*                                                        :::      ::::::::   */
 /*   fill_color_textures.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alexa <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/09 22:38:18 by alexa             #+#    #+#             */
-/*   Updated: 2023/02/09 22:38:19 by alexa            ###   ########.fr       */
+/*   Created: 2024/12/10 21:07:47 by dmodrzej          #+#    #+#             */
+/*   Updated: 2024/12/11 01:18:30 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static bool	no_digit(char *str)
+static int	has_only_non_digits(char *str)
 {
-	int		i;
-	bool	found_no_digit;
+	int	i;
 
 	i = 0;
-	found_no_digit = true;
 	while (str[i])
 	{
-		if (ft_isdigit(str[i]) == 1)
-			found_no_digit = false;
+		if (ft_isdigit(str[i]))
+			return (0);
 		i++;
 	}
-	return (found_no_digit);
+	return (1);
 }
 
-static int	*copy_into_rgb_array(char **rgb_to_convert, int *rgb)
+static int	*convert_and_validate_rgb(char **rgb_strings, int *rgb)
 {
-	int		i;
+	int	i;
 
 	i = -1;
-	while (rgb_to_convert[++i])
+	while (rgb_strings[++i])
 	{
-		rgb[i] = ft_atoi(rgb_to_convert[i]);
-		if (rgb[i] == -1 || no_digit(rgb_to_convert[i]) == true)
+		rgb[i] = ft_atoi(rgb_strings[i]);
+		if (rgb[i] == -1 || has_only_non_digits(rgb_strings[i]))
 		{
-			free_tab((void **)rgb_to_convert);
+			free_tab((void **)rgb_strings);
 			free(rgb);
 			return (0);
 		}
 	}
-	free_tab((void **)rgb_to_convert);
+	free_tab((void **)rgb_strings);
 	return (rgb);
 }
 
@@ -68,12 +66,12 @@ static int	*set_rgb_colors(char *line)
 		err_msg(NULL, ERR_MALLOC, 0);
 		return (0);
 	}
-	return (copy_into_rgb_array(rgb_to_convert, rgb));
+	return (convert_and_validate_rgb(rgb_to_convert, rgb));
 }
 
 int	fill_color_textures(t_data *data, t_texinfo *textures, char *line, int j)
 {
-	if (line[j + 1] && ft_isprint(line[j + 1]))
+	if (line[j + 1] && ft_isprint(line[j + 1]) && line[j + 1] != ' ')
 		return (err_msg(data->mapinfo.path, ERR_FLOOR_CEILING, ERR));
 	if (!textures->ceiling && line[j] == 'C')
 	{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_file_data.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dmodrzej <dmodrzej@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/09 22:29:52 by alexa             #+#    #+#             */
-/*   Updated: 2024/12/08 17:44:44 by dmodrzej         ###   ########.fr       */
+/*   Created: 2024/12/10 21:08:09 by dmodrzej          #+#    #+#             */
+/*   Updated: 2024/12/10 22:51:06 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ static char	*get_texture_path(char *line, int j)
 
 static int	fill_direction_textures(t_texinfo *textures, char *line, int j)
 {
-	if (line[j + 2] && line[j + 2] < 33 && line[j + 2] > 126)
+	if (line[j + 2] && ft_isprint(line[j + 2]) && line[j + 2] != ' ')
 		return (ERR);
 	if (line[j] == 'N' && line[j + 1] == 'O' && !(textures->north))
 		textures->north = get_texture_path(line, j + 2);
@@ -61,21 +61,20 @@ static int	ignore_whitespaces_get_info(t_data *data, char **map, int i, int j)
 {
 	while (map[i][j] == ' ' || map[i][j] == '\t' || map[i][j] == '\n')
 		j++;
-	if (ft_isprint(map[i][j]) && !ft_isdigit(map[i][j]))
+	if (ft_isprint(map[i][j]) && map[i][j] != ' ' && !ft_isdigit(map[i][j]))
 	{
-		if (map[i][j + 1] && ft_isprint(map[i][j + 1])
-			&& !ft_isdigit(map[i][j]))
+		if (map[i][j + 1] && ft_isprint(map[i][j + 1]) && map[i][j + 1] != ' ' && !ft_isdigit(map[i][j]))
 		{
 			if (fill_direction_textures(&data->texinfo, map[i], j) == ERR)
 				return (err_msg(data->mapinfo.path, ERR_TEX_INVALID, FAILURE));
 			return (BREAK);
-		}	
+		}
 		else
 		{
 			if (fill_color_textures(data, &data->texinfo, map[i], j) == ERR)
 				return (FAILURE);
 			return (BREAK);
-		}	
+		}
 	}
 	else if (ft_isdigit(map[i][j]))
 	{

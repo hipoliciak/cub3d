@@ -3,14 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   render.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mcombeau <mcombeau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/09 11:30:04 by mcombeau          #+#    #+#             */
-/*   Updated: 2023/02/12 13:45:01 by mcombeau         ###   ########.fr       */
+/*   Created: 2024/12/10 21:10:25 by dmodrzej          #+#    #+#             */
+/*   Updated: 2024/12/11 00:39:34 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
+
+static void	set_image_pixel(t_img *image, int x, int y, int color)
+{
+	int	pixel;
+
+	pixel = y * (image->size_line / 4) + x;
+	image->addr[pixel] = color;
+}
 
 static void	set_frame_image_pixel(t_data *data, t_img *image, int x, int y)
 {
@@ -22,7 +30,7 @@ static void	set_frame_image_pixel(t_data *data, t_img *image, int x, int y)
 		set_image_pixel(image, x, y, data->texinfo.hex_floor);
 }
 
-static void	render_frame(t_data *data)
+void	render_frame(t_data *data)
 {
 	t_img	image;
 	int		x;
@@ -45,7 +53,7 @@ static void	render_frame(t_data *data)
 	mlx_destroy_image(data->mlx, image.img);
 }
 
-static void	render_raycast(t_data *data)
+void	render_raycast(t_data *data)
 {
 	init_texture_pixels(data);
 	init_ray(&data->ray);
@@ -53,18 +61,14 @@ static void	render_raycast(t_data *data)
 	render_frame(data);
 }
 
-void	render_images(t_data *data)
-{
-	render_raycast(data);
-	if (BONUS)
-		render_minimap(data);
-}
-
 int	render(t_data *data)
 {
 	data->player.has_moved += move_player(data);
 	if (data->player.has_moved == 0)
+	{
+		render_frame(data);
 		return (0);
-	render_images(data);
+	}
+	render_raycast(data);
 	return (0);
 }

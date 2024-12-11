@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_textures.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alexa <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/09 22:29:02 by alexa             #+#    #+#             */
-/*   Updated: 2023/02/09 22:29:05 by alexa            ###   ########.fr       */
+/*   Created: 2024/12/10 21:07:05 by dmodrzej          #+#    #+#             */
+/*   Updated: 2024/12/11 01:02:30 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,20 @@
 
 static int	check_valid_rgb(int *rgb)
 {
-	int	i;
+	int		i;
+	char	*tmp;
 
 	i = 0;
+	tmp = NULL;
 	while (i < 3)
 	{
 		if (rgb[i] < 0 || rgb[i] > 255)
-			return (err_msg_val(rgb[i], ERR_TEX_RGB_VAL, FAILURE));
+		{
+			tmp = ft_itoa(rgb[i]);
+			err_msg(tmp, ERR_TEX_RGB_VAL, FAILURE);
+			free(tmp);
+			return (FAILURE);
+		}
 		i++;
 	}
 	return (SUCCESS);
@@ -47,11 +54,12 @@ int	check_textures_validity(t_data *data, t_texinfo *textures)
 		return (err_msg(data->mapinfo.path, ERR_TEX_MISSING, FAILURE));
 	if (!textures->floor || !textures->ceiling)
 		return (err_msg(data->mapinfo.path, ERR_COLOR_MISSING, FAILURE));
-	if (check_file(textures->north, false) == FAILURE
-		|| check_file(textures->south, false) == FAILURE
-		|| check_file(textures->west, false) == FAILURE
-		|| check_file(textures->east, false) == FAILURE
-		|| check_valid_rgb(textures->floor) == FAILURE
+	if (!is_xpm_file(textures->north)
+		|| !is_xpm_file(textures->south)
+		|| !is_xpm_file(textures->west)
+		|| !is_xpm_file(textures->east))
+		return (FAILURE);
+	if (check_valid_rgb(textures->floor) == FAILURE
 		|| check_valid_rgb(textures->ceiling) == FAILURE)
 		return (FAILURE);
 	textures->hex_floor = convert_rgb_to_hex(textures->floor);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   create_game_map.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alexa <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/09 22:29:30 by alexa             #+#    #+#             */
-/*   Updated: 2023/02/09 22:29:33 by alexa            ###   ########.fr       */
+/*   Created: 2024/12/10 21:07:16 by dmodrzej          #+#    #+#             */
+/*   Updated: 2024/12/11 01:33:03 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,9 @@ static int	count_map_lines(t_data *data, char **file, int i)
 	while (file[i])
 	{
 		j = 0;
-		while (file[i][j] == ' ' || file[i][j] == '\t' || file[i][j] == '\r'
-		|| file[i][j] == '\v' || file[i][j] == '\f')
+		// while (file[i][j] == ' ' || file[i][j] == '\t' || file[i][j] == '\r'
+		// || file[i][j] == '\v' || file[i][j] == '\f')
+		while (ft_isspace_not_nl(file[i][j]))
 			j++;
 		if (file[i][j] != '1')
 			break ;
@@ -49,7 +50,7 @@ static int	fill_map_tab(t_mapinfo *mapinfo, char **map_tab, int index)
 		{
 			map_tab[i][j] = mapinfo->file[index][j];
 			j++;
-		}	
+		}
 		while (j < mapinfo->width)
 			map_tab[i][j++] = '\0';
 		i++;
@@ -79,9 +80,10 @@ static void	change_space_into_wall(t_data *data)
 	while (data->map[i])
 	{
 		j = 0;
-		while (data->map[i][j] == ' ' || data->map[i][j] == '\t'
-		|| data->map[i][j] == '\r'
-		|| data->map[i][j] == '\v' || data->map[i][j] == '\f')
+		// while (data->map[i][j] == ' ' || data->map[i][j] == '\t'
+		// || data->map[i][j] == '\r'
+		// || data->map[i][j] == '\v' || data->map[i][j] == '\f')
+		while (ft_isspace_not_nl(data->map[i][j]))
 			j++;
 		while (data->map[i][++j])
 		{
