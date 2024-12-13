@@ -6,30 +6,79 @@
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:07:39 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/10 21:07:42 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/13 01:04:53 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-void	clean_exit(t_data *data, int code)
+void	free_tab(void **tab)
 {
-	if (!data)
-		exit(code);
-	if (data->win && data->mlx)
-		mlx_destroy_window(data->mlx, data->win);
-	if (data->mlx)
+	size_t	i;
+
+	i = 0;
+	while (tab[i])
 	{
-		mlx_destroy_display(data->mlx);
-		mlx_loop_end(data->mlx);
-		free(data->mlx);
+		free(tab[i]);
+		i++;
 	}
-	free_data(data);
+	if (tab)
+	{
+		free(tab);
+		tab = NULL;
+	}
+}
+
+void	free_texture(t_tex *textures)
+{
+	if (textures->north)
+		free(textures->north);
+	if (textures->south)
+		free(textures->south);
+	if (textures->west)
+		free(textures->west);
+	if (textures->east)
+		free(textures->east);
+	if (textures->floor)
+		free(textures->floor);
+	if (textures->ceiling)
+		free(textures->ceiling);
+}
+
+int	free_game(t_game *game)
+{
+	if (game->textures)
+		free_tab((void **)game->textures);
+	if (game->texture_pixels)
+		free_tab((void **)game->texture_pixels);
+	if (game->map.fd > 0)
+		close(game->map.fd);
+	if (game->map.file)
+		free_tab((void **)game->map.file);
+	if (game->mapf)
+		free_tab((void **)game->mapf);
+	free_texture(&game->texture);
+	return (1);
+}
+
+void	clean_exit(t_game *game, int code)
+{
+	if (!game)
+		exit(code);
+	if (game->win && game->mlx)
+		mlx_destroy_window(game->mlx, game->win);
+	if (game->mlx)
+	{
+		mlx_destroy_display(game->mlx);
+		mlx_loop_end(game->mlx);
+		free(game->mlx);
+	}
+	free_game(game);
 	exit(code);
 }
 
-int	quit_cub3d(t_data *data)
+int	quit_cub3d(t_game *game)
 {
-	clean_exit(data, 0);
+	clean_exit(game, 0);
 	return (0);
 }

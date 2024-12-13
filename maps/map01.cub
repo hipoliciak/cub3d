@@ -1,10 +1,10 @@
-NO textures/north.xpm
-SO textures/south.xpm
-WE textures/west.xpm
-EA textures/east.xpm
+NO textures/coal.xpm
+SO textures/treerings.xpm
+WE textures/bookshelf.xpm
+EA textures/bricks.xpm
 
-F	220,100,0  
-C	0,0,255    
+F 220,180,10
+C 222,67,255
 
 1111111111111111111
 1000001111100000001

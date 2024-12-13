@@ -6,13 +6,13 @@
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:07:16 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/11 01:33:03 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/13 01:04:53 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static int	count_map_lines(t_data *data, char **file, int i)
+static int	count_map_lines(t_game *game, char **file, int i)
 {
 	int	index_value;
 	int	j;
@@ -21,84 +21,79 @@ static int	count_map_lines(t_data *data, char **file, int i)
 	while (file[i])
 	{
 		j = 0;
-		// while (file[i][j] == ' ' || file[i][j] == '\t' || file[i][j] == '\r'
-		// || file[i][j] == '\v' || file[i][j] == '\f')
 		while (ft_isspace_not_nl(file[i][j]))
 			j++;
 		if (file[i][j] != '1')
 			break ;
 		i++;
 	}
-	data->mapinfo.index_end_of_map = i;
+	game->map.index_end_of_map = i;
 	return (i - index_value);
 }
 
-static int	fill_map_tab(t_mapinfo *mapinfo, char **map_tab, int index)
+static int	fill_mapf_tab(t_map *map, char **mapf_tab, int index)
 {
 	int		i;
 	int		j;
 
-	mapinfo->width = find_biggest_len(mapinfo, index);
+	map->width = find_biggest_len(map, index);
 	i = 0;
-	while (i < mapinfo->height)
+	while (i < map->height)
 	{
 		j = 0;
-		map_tab[i] = malloc(sizeof(char) * (mapinfo->width + 1));
-		if (!map_tab[i])
-			return (err_msg(NULL, ERR_MALLOC, FAILURE));
-		while (mapinfo->file[index][j] && mapinfo->file[index][j] != '\n')
+		mapf_tab[i] = malloc(sizeof(char) * (map->width + 1));
+		if (!mapf_tab[i])
+			return (err("Could not allocate memory", 1));
+		while (map->file[index][j] && map->file[index][j] != '\n')
 		{
-			map_tab[i][j] = mapinfo->file[index][j];
+			mapf_tab[i][j] = map->file[index][j];
 			j++;
 		}
-		while (j < mapinfo->width)
-			map_tab[i][j++] = '\0';
+		while (j < map->width)
+			mapf_tab[i][j++] = '\0';
 		i++;
 		index++;
 	}
-	map_tab[i] = NULL;
-	return (SUCCESS);
+	mapf_tab[i] = NULL;
+	return (0);
 }
 
-static int	get_map_info(t_data *data, char **file, int i)
+static int	get_map_info(t_game *game, char **file, int i)
 {
-	data->mapinfo.height = count_map_lines(data, file, i);
-	data->map = malloc(sizeof(char *) * (data->mapinfo.height + 1));
-	if (!data->map)
-		return (err_msg(NULL, ERR_MALLOC, FAILURE));
-	if (fill_map_tab(&data->mapinfo, data->map, i) == FAILURE)
-		return (FAILURE);
-	return (SUCCESS);
+	game->map.height = count_map_lines(game, file, i);
+	game->mapf = malloc(sizeof(char *) * (game->map.height + 1));
+	if (!game->mapf)
+		return (err("Could not allocate memory", 1));
+	if (fill_mapf_tab(&game->map, game->mapf, i))
+		return (1);
+	return (0);
 }
 
-static void	change_space_into_wall(t_data *data)
+static void	change_space_into_wall(t_game *game)
 {
 	int	i;
 	int	j;
 
 	i = 0;
-	while (data->map[i])
+	while (game->mapf[i])
 	{
 		j = 0;
-		// while (data->map[i][j] == ' ' || data->map[i][j] == '\t'
-		// || data->map[i][j] == '\r'
-		// || data->map[i][j] == '\v' || data->map[i][j] == '\f')
-		while (ft_isspace_not_nl(data->map[i][j]))
+		while (ft_isspace_not_nl(game->mapf[i][j]))
 			j++;
-		while (data->map[i][++j])
+		while (game->mapf[i][++j])
 		{
-			if (data->map[i][j] == ' '
-				&& j != data->map[i][ft_strlen(data->map[i]) - 1])
-				data->map[i][j] = '1';
+			if (game->mapf[i][j] == ' '
+				&& j != game->mapf[i][ft_strlen(game->mapf[i]) - 1])
+				game->mapf[i][j] = '1';
 		}
 		i++;
 	}
 }
 
-int	create_map(t_data *data, char **file, int i)
+int	create_map(t_game *game, char **file, int i)
 {
-	if (get_map_info(data, file, i) == FAILURE)
-		return (FAILURE);
-	change_space_into_wall(data);
-	return (SUCCESS);
+	if (get_map_info(game, file, i))
+		return (1);
+	change_space_into_wall(game);
+	return (0);
 }

@@ -6,13 +6,13 @@
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:10:25 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/11 00:39:34 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/13 00:42:25 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static void	set_image_pixel(t_img *image, int x, int y, int color)
+void	set_image_pixel(t_img *image, int x, int y, int color)
 {
 	int	pixel;
 
@@ -20,55 +20,55 @@ static void	set_image_pixel(t_img *image, int x, int y, int color)
 	image->addr[pixel] = color;
 }
 
-static void	set_frame_image_pixel(t_data *data, t_img *image, int x, int y)
+void	set_frame_image_pixel(t_game *game, t_img *image, int x, int y)
 {
-	if (data->texture_pixels[y][x] > 0)
-		set_image_pixel(image, x, y, data->texture_pixels[y][x]);
-	else if (y < data->win_height / 2)
-		set_image_pixel(image, x, y, data->texinfo.hex_ceiling);
-	else if (y < data->win_height -1)
-		set_image_pixel(image, x, y, data->texinfo.hex_floor);
+	if (game->texture_pixels[y][x] > 0)
+		set_image_pixel(image, x, y, game->texture_pixels[y][x]);
+	else if (y < game->win_height / 2)
+		set_image_pixel(image, x, y, game->texture.hex_ceiling);
+	else if (y < game->win_height -1)
+		set_image_pixel(image, x, y, game->texture.hex_floor);
 }
 
-void	render_frame(t_data *data)
+void	render_frame(t_game *game)
 {
 	t_img	image;
 	int		x;
 	int		y;
 
 	image.img = NULL;
-	init_img(data, &image, data->win_width, data->win_height);
+	init_img(game, &image, game->win_width, game->win_height);
 	y = 0;
-	while (y < data->win_height)
+	while (y < game->win_height)
 	{
 		x = 0;
-		while (x < data->win_width)
+		while (x < game->win_width)
 		{
-			set_frame_image_pixel(data, &image, x, y);
+			set_frame_image_pixel(game, &image, x, y);
 			x++;
 		}
 		y++;
 	}
-	mlx_put_image_to_window(data->mlx, data->win, image.img, 0, 0);
-	mlx_destroy_image(data->mlx, image.img);
+	mlx_put_image_to_window(game->mlx, game->win, image.img, 0, 0);
+	mlx_destroy_image(game->mlx, image.img);
 }
 
-void	render_raycast(t_data *data)
+void	render_raycast(t_game *game)
 {
-	init_texture_pixels(data);
-	init_ray(&data->ray);
-	raycasting(&data->player, data);
-	render_frame(data);
+	init_texture_pixels(game);
+	init_ray(&game->ray);
+	raycasting(&game->player, game);
+	render_frame(game);
 }
 
-int	render(t_data *data)
+int	render(t_game *game)
 {
-	data->player.has_moved += move_player(data);
-	if (data->player.has_moved == 0)
+	game->player.has_moved += move_player(game);
+	if (game->player.has_moved == 0)
 	{
-		render_frame(data);
+		render_frame(game);
 		return (0);
 	}
-	render_raycast(data);
+	render_raycast(game);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:10:55 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/11 01:40:15 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/13 01:08:06 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,8 @@
 # include "libft.h"
 # include "ft_printf.h"
 # include "mlx.h"
-# include <errno.h>
 # include <fcntl.h>
 # include <math.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <string.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <unistd.h>
 
 // Macros
 
@@ -34,51 +27,6 @@
 # define TEX_SIZE 64
 # define MOVESPEED 0.0125
 # define ROTSPEED 0.015
-
-// Errors
-
-# define ERR_USAGE "usage: ./cub3d <path/to/map.cub>"
-
-# define ERR_FILE_NOT_CUB "Not a .cub file"
-# define ERR_FILE_NOT_XPM "Not an .xpm file"
-# define ERR_FILE_IS_DIR "Is a directory"
-# define ERR_FLOOR_CEILING "Invalid floor/ceiling RGB color(s)"
-# define ERR_COLOR_FLOOR "Invalid floor RGB color"
-# define ERR_COLOR_CEILING "Invalid ceiling RGB color"
-# define ERR_INVALID_MAP "Map description is either wrong or incomplete"
-# define ERR_INV_LETTER "Invalid character in map"
-# define ERR_NUM_PLAYER "Map has more than one player"
-# define ERR_TEX_RGB_VAL "Invalid RGB value (min: 0, max: 255)"
-# define ERR_TEX_MISSING "Missing texture(s)"
-# define ERR_TEX_INVALID "Invalid texture(s)"
-# define ERR_COLOR_MISSING "Missing color(s)"
-# define ERR_MAP_MISSING "Missing map"
-# define ERR_MAP_TOO_SMALL "Map is not at least 3 lines high"
-# define ERR_MAP_NO_WALLS "Map is not surrounded by walls"
-# define ERR_MAP_LAST "Map is not the last element in file"
-# define ERR_PLAYER_POS "Invalid player position"
-# define ERR_PLAYER_DIR "Map has no player position (expected N, S, E or W)"
-# define ERR_MALLOC "Could not allocate memory"
-# define ERR_MLX_START "Could not start mlx"
-# define ERR_MLX_WIN "Could not create mlx window"
-# define ERR_MLX_IMG "Could not create mlx image"
-
-enum e_output
-{
-	SUCCESS = 0,
-	FAILURE = 1,
-	ERR = 2,
-	BREAK = 3,
-	CONTINUE = 4
-};
-
-enum e_texture_index
-{
-	NORTH = 0,
-	SOUTH = 1,
-	EAST = 2,
-	WEST = 3
-};
 
 // Structures
 
@@ -91,7 +39,7 @@ typedef struct s_img
 	int		endian;
 }	t_img;
 
-typedef struct s_texinfo
+typedef struct s_tex
 {
 	char			*north;
 	char			*south;
@@ -107,18 +55,18 @@ typedef struct s_texinfo
 	double			pos;
 	int				x;
 	int				y;
-}	t_texinfo;
+}	t_tex;
 
-typedef struct s_mapinfo
+typedef struct s_map
 {
-	int			fd;
-	int			line_count;
-	char		*path;
-	char		**file;
-	int			height;
-	int			width;
-	int			index_end_of_map;
-}	t_mapinfo;
+	int		fd;
+	int		line_count;
+	char	*path;
+	char	**file;
+	int		height;
+	int		width;
+	int		index_end_of_map;
+}	t_map;
 
 typedef struct s_ray
 {
@@ -156,105 +104,108 @@ typedef struct s_player
 	int		rotate;
 }	t_player;
 
-typedef struct s_data
+typedef struct s_game
 {
 	void		*mlx;
 	void		*win;
 	int			win_height;
 	int			win_width;
-	t_mapinfo	mapinfo;
-	char		**map;
+	t_map		map;
+	char		**mapf;
 	t_player	player;
 	t_ray		ray;
 	int			**texture_pixels;
 	int			**textures;
-	t_texinfo	texinfo;
-	t_img		minimap;
-}	t_data;
+	t_tex		texture;
+}	t_game;
 
 // Prototypes
 
-/* init/init_data.c */
-void	init_data(t_data *data);
-void	init_img_clean(t_img *img);
-void	init_ray(t_ray *ray);
+// Init
+void			init_game(t_game *game);
+void			init_player(t_player *player);
+void			init_map(t_map *map);
+void			init_ray(t_ray *ray);
+void			init_img_clean(t_img *img);
+void			init_mlx(t_game *game);
+void			init_img(t_game *game, t_img *image, int width, int height);
+void			init_texture_img(t_game *game, t_img *image, char *path);
+void			init_tex(t_tex *textures);
+void			init_textures(t_game *game);
+int				*xpm_to_img(t_game *game, char *path);
 
-/* init/init_mlx.c */
-void	init_mlx(t_data *data);
-void	init_img(t_data *data, t_img *image, int width, int height);
-void	init_texture_img(t_data *data, t_img *image, char *path);
+// Check file
+int				is_cub_file(char *arg);
+int				check_eof(t_map *map);
+int				check_textures(t_tex *textures);
+int				is_xpm_file(char *arg);
+int				is_valid_rgb_range(int *rgb);
 
-/* init/init_textures.c */
-void	init_textures(t_data *data);
-void	init_texinfo(t_texinfo *textures);
+// Check map
+int				check_map(t_game *game, char **mapf_tab);
+int				check_map_top_bottom(char **mapf_tab, int i, int j);
+int				check_map_borders(t_map *map, char **mapf_tab);
+int				check_map_elements(t_game *game, char **mapf_tab);
 
-/* parsing/parse_data.c */
-void	parse_data(char *path, t_data *data);
+// Init player
+int				check_player_position(t_game *game, char **mapf_tab);
+int				check_position_is_valid(t_game *game, char **mapf_tab);
+void			init_player_north_south(t_player *player);
+void			init_player_east_west(t_player *player);
+void			init_player_dir(t_game *game);
 
-/* parsing/get_file_data.c */
-int		get_file_data(t_data *data, char **map);
+// Get game
+int				read_file(char *path, t_game *game);
+void			fill_tab(int row, int column, int i, t_game *game);
+int				get_number_of_lines(char *path);
+int				parse_file(t_game *game, char **mapf);
+int				process_line_content(t_game *game, char **mapf, int i, int j);
+int				set_direction_textures(t_tex *textures, char *line, int j);
+char			*get_texture_path(char *line, int j);
+int				set_color_textures(t_tex *textures, char *line, int j);
+int				*parse_rgb(char *line);
+int				*convert_rgb(char **rgb_strings);
+int				rgb_str_digits(char *str);
+unsigned long	convert_rgb_to_hex(int *rgb_tab);
+int				create_map(t_game *game, char **mapf, int i);
 
-/* parsing/fill_color_textures.c */
-int		fill_color_textures(t_data *data, t_texinfo *textures,
-			char *line, int j);
+// Raycasting
+int				raycasting(t_player *player, t_game *game);
+void			init_raycasting_info(int x, t_ray *ray, t_player *player);
+void			set_dda(t_ray *ray, t_player *player);
+void			perform_dda(t_game *game, t_ray *ray);
+void			calc_line_height(t_ray *ray, t_game *game, t_player *player);
 
-/* parsing/create_game_map.c */
-int		create_map(t_data *data, char **map, int i);
-
-/* parsing/check_textures.c */
-int		check_textures_validity(t_data *data, t_texinfo *textures);
-
-/* parsing/check_map.c */
-int		check_map_validity(t_data *data, char **map_tab);
-
-/* parsing/check_map_borders.c */
-int		check_map_sides(t_mapinfo *map, char **map_tab);
-
-/* parsing/parsing_utils.c */
-int		is_a_white_space(char c);
-size_t	find_biggest_len(t_mapinfo *map, int i);
-
-/* render/render.c */
-int		render(t_data *data);
-void	render_raycast(t_data *data);
-
-/* render/raycasting.c */
-int		raycasting(t_player *player, t_data *data);
-
-/* render/texture.c */
-void	init_texture_pixels(t_data *data);
-void	update_texture_pixels(t_data *data, t_texinfo *tex, t_ray *ray, int x);
-
-/* movement/player_dir.c */
-void	init_player_direction(t_data *data);
-
-/* exit/exit.c */
-void	clean_exit(t_data *data, int code);
-int		quit_cub3d(t_data *data);
-
-/* exit/free_data.c */
-void	free_tab(void **tab);
-int		free_data(t_data *data);
-
-int		is_cub_file(char *arg);
-int		is_xpm_file(char *arg);
-
-void	render_frame(t_data *data);
+// Render
+int				render(t_game *game);
+void			render_raycast(t_game *game);
+void			render_frame(t_game *game);
+void			set_frame_image_pixel(t_game *game, t_img *image, int x, int y);
+void			set_image_pixel(t_img *image, int x, int y, int color);
+void			update_tex_pixels(t_game *game, t_tex *tex, t_ray *ray, int x);
+void			get_texture_index(t_game *game, t_ray *ray);
+void			init_texture_pixels(t_game *game);
 
 // Movement
-int		move_player(t_data *data);
-int		move_forward(t_data *data);
-int		move_backward(t_data *data);
-int		move_left(t_data *data);
-int		move_right(t_data *data);
-int		rotate(t_data *data, double rotdir);
-int		validate_move(t_data *data, double new_x, double new_y);
+int				move_player(t_game *game);
+int				move_forward(t_game *game);
+int				move_backward(t_game *game);
+int				move_left(t_game *game);
+int				move_right(t_game *game);
+int				rotate(t_game *game, double rotdir);
+int				validate_move(t_game *game, double new_x, double new_y);
 
 // Utils
-size_t	find_biggest_len(t_mapinfo *map, int i);
-void	*ft_calloc(size_t count, size_t size);
-int		err_msg(char *detail, char *str, int code);
-int		ft_isspace(int c);
-int		ft_isspace_not_nl(int c);
+size_t			find_biggest_len(t_map *map, int i);
+int				err(char *str, int code);
+int				ft_isspace(int c);
+int				ft_isspace_not_nl(int c);
+
+// Exit
+void			clean_exit(t_game *game, int code);
+int				quit_cub3d(t_game *game);
+void			free_tab(void **tab);
+void			free_texture(t_tex *textures);
+int				free_game(t_game *game);
 
 #endif

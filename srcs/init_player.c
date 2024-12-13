@@ -1,18 +1,63 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   player_dir.c                                       :+:      :+:    :+:   */
+/*   init_player.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:09:37 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/11 01:07:22 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/13 01:04:53 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static void	init_player_north_south(t_player *player)
+int	check_position_is_valid(t_game *game, char **mapf_tab)
+{
+	int	i;
+	int	j;
+
+	i = (int)game->player.pos_y;
+	j = (int)game->player.pos_x;
+	if (ft_strlen(mapf_tab[i - 1]) < (size_t)j
+		|| ft_strlen(mapf_tab[i + 1]) < (size_t)j
+		|| ft_isspace(mapf_tab[i][j - 1])
+		|| ft_isspace(mapf_tab[i][j + 1])
+		|| ft_isspace(mapf_tab[i - 1][j])
+		|| ft_isspace(mapf_tab[i + 1][j]))
+		return (1);
+	return (0);
+}
+
+int	check_player_position(t_game *game, char **mapf_tab)
+{
+	int	i;
+	int	j;
+
+	if (game->player.dir == '0')
+		return (1);
+	i = 0;
+	while (mapf_tab[i])
+	{
+		j = 0;
+		while (mapf_tab[i][j])
+		{
+			if (ft_strchr("NEWS", mapf_tab[i][j]))
+			{
+				game->player.pos_x = (double)j + 0.5;
+				game->player.pos_y = (double)i + 0.5;
+				mapf_tab[i][j] = '0';
+			}
+			j++;
+		}
+		i++;
+	}
+	if (check_position_is_valid(game, mapf_tab))
+		return (1);
+	return (0);
+}
+
+void	init_player_north_south(t_player *player)
 {
 	if (player->dir == 'S')
 	{
@@ -32,7 +77,7 @@ static void	init_player_north_south(t_player *player)
 		return ;
 }
 
-static void	init_player_east_west(t_player *player)
+void	init_player_east_west(t_player *player)
 {
 	if (player->dir == 'W')
 	{
@@ -52,8 +97,8 @@ static void	init_player_east_west(t_player *player)
 		return ;
 }
 
-void	init_player_direction(t_data *data)
+void	init_player_dir(t_game *game)
 {
-	init_player_north_south(&data->player);
-	init_player_east_west(&data->player);
+	init_player_north_south(&game->player);
+	init_player_east_west(&game->player);
 }

@@ -6,85 +6,87 @@
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:08:52 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/11 00:39:50 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/13 01:04:53 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static int	key_press_handler(int key, t_data *data)
+static int	key_press(int key, t_game *game)
 {
 	if (key == CLOSE_BTN || key == KEY_ESC || key == KEY_Q)
-		quit_cub3d(data);
+		quit_cub3d(game);
 	if (key == KEY_AR_L)
-		data->player.rotate -= 1;
+		game->player.rotate -= 1;
 	if (key == KEY_AR_R)
-		data->player.rotate += 1;
+		game->player.rotate += 1;
 	if (key == KEY_W)
-		data->player.move_y = 1;
+		game->player.move_y = 1;
 	if (key == KEY_A)
-		data->player.move_x = -1;
+		game->player.move_x = -1;
 	if (key == KEY_S)
-		data->player.move_y = -1;
+		game->player.move_y = -1;
 	if (key == KEY_D)
-		data->player.move_x = 1;
+		game->player.move_x = 1;
 	return (0);
 }
 
-static int	key_release_handler(int key, t_data *data)
+static int	key_release(int key, t_game *game)
 {
 	if (key == CLOSE_BTN || key == KEY_ESC || key == KEY_Q)
-		quit_cub3d(data);
-	if (key == KEY_W && data->player.move_y == 1)
-		data->player.move_y = 0;
-	if (key == KEY_S && data->player.move_y == -1)
-		data->player.move_y = 0;
-	if (key == KEY_A && data->player.move_x == -1)
-		data->player.move_x += 1;
-	if (key == KEY_D && data->player.move_x == 1)
-		data->player.move_x -= 1;
-	if (key == KEY_AR_L && data->player.rotate <= 1)
-		data->player.rotate = 0;
-	if (key == KEY_AR_R && data->player.rotate >= -1)
-		data->player.rotate = 0;
+		quit_cub3d(game);
+	if (key == KEY_W && game->player.move_y == 1)
+		game->player.move_y = 0;
+	if (key == KEY_S && game->player.move_y == -1)
+		game->player.move_y = 0;
+	if (key == KEY_A && game->player.move_x == -1)
+		game->player.move_x += 1;
+	if (key == KEY_D && game->player.move_x == 1)
+		game->player.move_x -= 1;
+	if (key == KEY_AR_L && game->player.rotate <= 1)
+		game->player.rotate = 0;
+	if (key == KEY_AR_R && game->player.rotate >= -1)
+		game->player.rotate = 0;
 	return (0);
 }
 
-static int	parse_args(t_data *data, char **av)
+static int	parse_args(t_game *game, char **av)
 {
-	if (!is_cub_file(av[1]))
+	if (is_cub_file(av[1]))
+		return (err("Not a .cub file", 1));
+	if (read_file(av[1], game))
+		return (err("Could not read file", 1));
+	if (parse_file(game, game->map.file))
+		return (free_game(game));
+	if (check_map(game, game->mapf))
+		return (free_game(game));
+	if (check_textures(&game->texture))
+		return (free_game(game));
+	if (check_eof(&game->map))
 	{
-		err_msg(av[1], ERR_FILE_NOT_CUB, 1);
-		return (1);
+		err("There is something after the map", 1);
+		return (free_game(game));
 	}
-	parse_data(av[1], data);
-	if (get_file_data(data, data->mapinfo.file) == FAILURE)
-		return (free_data(data));
-	if (check_map_validity(data, data->map) == FAILURE)
-		return (free_data(data));
-	if (check_textures_validity(data, &data->texinfo) == FAILURE)
-		return (free_data(data));
-	init_player_direction(data);
+	init_player_dir(game);
 	return (0);
 }
 
 int	main(int ac, char **av)
 {
-	t_data	data;
+	t_game	game;
 
 	if (ac != 2)
-		return (err_msg("Usage", ERR_USAGE, 1));
-	init_data(&data);
-	if (parse_args(&data, av) != 0)
+		return (err("Wrong number of arguments", 1));
+	init_game(&game);
+	if (parse_args(&game, av))
 		return (1);
-	init_mlx(&data);
-	init_textures(&data);
-	render_raycast(&data);
-	// render(&data);
-	mlx_hook(data.win, KEY_PRESS, KEY_PRESS_MASK, key_press_handler, &data);
-	mlx_hook(data.win, KEY_RELEASE, KEY_RELEASE_MASK, key_release_handler, &data);
-	mlx_hook(data.win, CLOSE_BTN, NO_EVENT_MASK, quit_cub3d, &data);
-	mlx_loop_hook(data.mlx, render, &data);
-	mlx_loop(data.mlx);
+	init_mlx(&game);
+	init_textures(&game);
+	render_raycast(&game);
+	mlx_hook(game.win, KEY_PRESS, KEY_PRESS_MASK, key_press, &game);
+	mlx_hook(game.win, KEY_RELEASE, KEY_RELEASE_MASK, key_release, &game);
+	mlx_hook(game.win, CLOSE_BTN, NO_EVENT_MASK, quit_cub3d, &game);
+	mlx_loop_hook(game.mlx, render, &game);
+	mlx_loop(game.mlx);
 	return (0);
 }

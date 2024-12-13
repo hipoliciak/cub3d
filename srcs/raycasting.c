@@ -6,13 +6,13 @@
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:10:19 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/10 21:10:21 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/13 01:06:45 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static void	init_raycasting_info(int x, t_ray *ray, t_player *player)
+void	init_raycasting_info(int x, t_ray *ray, t_player *player)
 {
 	init_ray(ray);
 	ray->camera_x = 2 * x / (double)WIN_WIDTH - 1;
@@ -24,7 +24,7 @@ static void	init_raycasting_info(int x, t_ray *ray, t_player *player)
 	ray->deltadist_y = fabs(1 / ray->dir_y);
 }
 
-static void	set_dda(t_ray *ray, t_player *player)
+void	set_dda(t_ray *ray, t_player *player)
 {
 	if (ray->dir_x < 0)
 	{
@@ -48,7 +48,7 @@ static void	set_dda(t_ray *ray, t_player *player)
 	}
 }
 
-static void	perform_dda(t_data *data, t_ray *ray)
+void	perform_dda(t_game *game, t_ray *ray)
 {
 	int	hit;
 
@@ -69,27 +69,27 @@ static void	perform_dda(t_data *data, t_ray *ray)
 		}
 		if (ray->map_y < 0.25
 			|| ray->map_x < 0.25
-			|| ray->map_y > data->mapinfo.height - 0.25
-			|| ray->map_x > data->mapinfo.width - 1.25)
+			|| ray->map_y > game->map.height - 0.25
+			|| ray->map_x > game->map.width - 1.25)
 			break ;
-		else if (data->map[ray->map_y][ray->map_x] > '0')
+		else if (game->mapf[ray->map_y][ray->map_x] > '0')
 			hit = 1;
 	}
 }
 
-static void	calculate_line_height(t_ray *ray, t_data *data, t_player *player)
+void	calc_line_height(t_ray *ray, t_game *game, t_player *player)
 {
 	if (ray->side == 0)
 		ray->wall_dist = (ray->sidedist_x - ray->deltadist_x);
 	else
 		ray->wall_dist = (ray->sidedist_y - ray->deltadist_y);
-	ray->line_height = (int)(data->win_height / ray->wall_dist);
-	ray->draw_start = -(ray->line_height) / 2 + data->win_height / 2;
+	ray->line_height = (int)(game->win_height / ray->wall_dist);
+	ray->draw_start = -(ray->line_height) / 2 + game->win_height / 2;
 	if (ray->draw_start < 0)
 		ray->draw_start = 0;
-	ray->draw_end = ray->line_height / 2 + data->win_height / 2;
-	if (ray->draw_end >= data->win_height)
-		ray->draw_end = data->win_height - 1;
+	ray->draw_end = ray->line_height / 2 + game->win_height / 2;
+	if (ray->draw_end >= game->win_height)
+		ray->draw_end = game->win_height - 1;
 	if (ray->side == 0)
 		ray->wall_x = player->pos_y + ray->wall_dist * ray->dir_y;
 	else
@@ -97,21 +97,21 @@ static void	calculate_line_height(t_ray *ray, t_data *data, t_player *player)
 	ray->wall_x -= floor(ray->wall_x);
 }
 
-int	raycasting(t_player *player, t_data *data)
+int	raycasting(t_player *player, t_game *game)
 {
 	t_ray	ray;
 	int		x;
 
 	x = 0;
-	ray = data->ray;
-	while (x < data->win_width)
+	ray = game->ray;
+	while (x < game->win_width)
 	{
 		init_raycasting_info(x, &ray, player);
 		set_dda(&ray, player);
-		perform_dda(data, &ray);
-		calculate_line_height(&ray, data, player);
-		update_texture_pixels(data, &data->texinfo, &ray, x);
+		perform_dda(game, &ray);
+		calc_line_height(&ray, game, player);
+		update_tex_pixels(game, &game->texture, &ray, x);
 		x++;
 	}
-	return (SUCCESS);
+	return (0);
 }

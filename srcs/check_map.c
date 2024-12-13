@@ -6,128 +6,85 @@
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:06:57 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/11 01:32:23 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/13 01:04:53 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static int	check_map_elements(t_data *data, char **map_tab)
+int	check_map_elements(t_game *game, char **mapf_tab)
 {
 	int	i;
 	int	j;
 
 	i = 0;
-	data->player.dir = '0';
-	while (map_tab[i] != NULL)
+	game->player.dir = '0';
+	while (mapf_tab[i])
 	{
 		j = 0;
-		while (map_tab[i][j])
+		while (mapf_tab[i][j])
 		{
-			// while (data->map[i][j] == ' ' || data->map[i][j] == '\t'
-			// || data->map[i][j] == '\r'
-			// || data->map[i][j] == '\v' || data->map[i][j] == '\f')
-			while (ft_isspace_not_nl(map_tab[i][j]))
+			while (ft_isspace_not_nl(mapf_tab[i][j]))
 				j++;
-			if (!(ft_strchr("10NSEW", map_tab[i][j])))
-				return (err_msg(data->mapinfo.path, ERR_INV_LETTER, FAILURE));
-			if (ft_strchr("NSEW", map_tab[i][j]) && data->player.dir != '0')
-				return (err_msg(data->mapinfo.path, ERR_NUM_PLAYER, FAILURE));
-			if (ft_strchr("NSEW", map_tab[i][j]) && data->player.dir == '0')
-				data->player.dir = map_tab[i][j];
+			if (!(ft_strchr("10NEWS", mapf_tab[i][j])))
+				return (1);
+			if (ft_strchr("NEWS", mapf_tab[i][j]) && game->player.dir != '0')
+				return (1);
+			if (ft_strchr("NEWS", mapf_tab[i][j]) && game->player.dir == '0')
+				game->player.dir = mapf_tab[i][j];
 			j++;
 		}
 		i++;
 	}
-	return (SUCCESS);
+	return (0);
 }
 
-static int	check_position_is_valid(t_data *data, char **map_tab)
+int	check_map_top_bottom(char **mapf_tab, int i, int j)
 {
-	int	i;
-	int	j;
-
-	i = (int)data->player.pos_y;
-	j = (int)data->player.pos_x;
-	if (ft_strlen(map_tab[i - 1]) < (size_t)j
-		|| ft_strlen(map_tab[i + 1]) < (size_t)j
-		|| ft_isspace(map_tab[i][j - 1])
-		|| ft_isspace(map_tab[i][j + 1])
-		|| ft_isspace(map_tab[i - 1][j])
-		|| ft_isspace(map_tab[i + 1][j]))
-		// || is_a_white_space(map_tab[i][j - 1]) == SUCCESS
-		// || is_a_white_space(map_tab[i][j + 1]) == SUCCESS
-		// || is_a_white_space(map_tab[i - 1][j]) == SUCCESS
-		// || is_a_white_space(map_tab[i + 1][j]) == SUCCESS)
-		return (FAILURE);
-	return (SUCCESS);
-}
-
-static int	check_player_position(t_data *data, char **map_tab)
-{
-	int	i;
-	int	j;
-
-	if (data->player.dir == '0')
-		return (err_msg(data->mapinfo.path, ERR_PLAYER_DIR, FAILURE));
-	i = 0;
-	while (map_tab[i])
+	if (!mapf_tab || !mapf_tab[i] || !mapf_tab[i][j])
+		return (1);
+	while (ft_isspace_not_nl(mapf_tab[i][j]))
+		j++;
+	while (mapf_tab[i][j])
 	{
-		j = 0;
-		while (map_tab[i][j])
-		{
-			if (ft_strchr("NSEW", map_tab[i][j]))
-			{
-				data->player.pos_x = (double)j + 0.5;
-				data->player.pos_y = (double)i + 0.5;
-				map_tab[i][j] = '0';
-			}
-			j++;
-		}
-		i++;
+		if (mapf_tab[i][j] != '1')
+			return (1);
+		j++;
 	}
-	if (check_position_is_valid(data, map_tab) == FAILURE)
-		return (err_msg(data->mapinfo.path, ERR_PLAYER_POS, FAILURE));
-	return (SUCCESS);
+	return (0);
 }
 
-static int	check_map_is_at_the_end(t_mapinfo *map)
+int	check_map_borders(t_map *map, char **mapf_tab)
 {
 	int	i;
 	int	j;
 
-	i = map->index_end_of_map;
-	while (map->file[i])
+	if (check_map_top_bottom(mapf_tab, 0, 0))
+		return (1);
+	i = 1;
+	while (i < (map->height - 1))
 	{
-		j = 0;
-		while (map->file[i][j])
-		{
-			// if (map->file[i][j] != ' ' && map->file[i][j] != '\t'
-			// 	&& map->file[i][j] != '\r' && map->file[i][j] != '\n'
-			// 	&& map->file[i][j] != '\v' && map->file[i][j] != '\f')
-			// 	return (FAILURE);
-			if (ft_isspace(map->file[i][j]))
-				return (FAILURE);
-			j++;
-		}
+		j = ft_strlen(mapf_tab[i]) - 1;
+		if (mapf_tab[i][j] != '1')
+			return (1);
 		i++;
 	}
-	return (SUCCESS);
+	if (check_map_top_bottom(mapf_tab, i, 0))
+		return (1);
+	return (0);
 }
 
-int	check_map_validity(t_data *data, char **map_tab)
+int	check_map(t_game *game, char **mapf_tab)
 {
-	if (!data->map)
-		return (err_msg(data->mapinfo.path, ERR_MAP_MISSING, FAILURE));
-	if (check_map_sides(&data->mapinfo, map_tab) == FAILURE)
-		return (err_msg(data->mapinfo.path, ERR_MAP_NO_WALLS, FAILURE));
-	if (data->mapinfo.height < 3)
-		return (err_msg(data->mapinfo.path, ERR_MAP_TOO_SMALL, FAILURE));
-	if (check_map_elements(data, map_tab) == FAILURE)
-		return (FAILURE);
-	if (check_player_position(data, map_tab) == FAILURE)
-		return (FAILURE);
-	if (check_map_is_at_the_end(&data->mapinfo) == FAILURE)
-		return (err_msg(data->mapinfo.path, ERR_MAP_LAST, FAILURE));
-	return (SUCCESS);
+	if (!game->mapf)
+		return (err("Map not found", 1));
+	if (check_map_borders(&game->map, mapf_tab))
+		return (err("Invalid map borders", 1));
+	if (game->map.height < 3)
+		return (err("Map too small", 1));
+	if (check_map_elements(game, mapf_tab))
+		return (err("Invalid map elements", 1));
+	if (check_player_position(game, mapf_tab))
+		return (err("Invalid player position", 1));
+	return (0);
 }
