@@ -6,7 +6,7 @@
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:08:09 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/13 01:05:34 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/14 23:22:14 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,31 @@ int	set_direction_textures(t_tex *textures, char *line, int j)
 	return (0);
 }
 
+int	set_color_textures(t_tex *textures, char *line, int j)
+{
+	if (line[j + 1] && ft_isprint(line[j + 1]) && line[j + 1] != ' ')
+		return (2);
+	if (!textures->ceiling && line[j] == 'C')
+	{
+		textures->ceiling = parse_rgb(line + j + 1);
+		if (!textures->ceiling)
+			return (2);
+		else
+			textures->hex_ceiling = convert_rgb_to_hex(textures->ceiling);
+	}
+	else if (!textures->floor && line[j] == 'F')
+	{
+		textures->floor = parse_rgb(line + j + 1);
+		if (!textures->floor)
+			return (2);
+		else
+			textures->hex_floor = convert_rgb_to_hex(textures->floor);
+	}
+	else
+		return (2);
+	return (0);
+}
+
 int	process_line_content(t_game *game, char **mapf, int i, int j)
 {
 	while (mapf[i][j] == ' ' || mapf[i][j] == '\t' || mapf[i][j] == '\n')
@@ -74,20 +99,20 @@ int	process_line_content(t_game *game, char **mapf, int i, int j)
 			mapf[i][j + 1] != ' ' && !ft_isdigit(mapf[i][j]))
 		{
 			if (set_direction_textures(&game->texture, mapf[i], j))
-				return (err("Invalid texture", 1));
+				return (err("Invalid texture", 2));
 			return (-1);
 		}
 		else
 		{
 			if (set_color_textures(&game->texture, mapf[i], j))
-				return (1);
+				return (err("Invalid RGB color", 2));
 			return (-1);
 		}
 	}
 	else if (ft_isdigit(mapf[i][j]))
 	{
 		if (create_map(game, mapf, i) != 0)
-			return (err("Invalid map", 1));
+			return (err("Invalid map", 2));
 		return (0);
 	}
 	return (1);
@@ -108,6 +133,8 @@ int	parse_file(t_game *game, char **mapf)
 			ret = process_line_content(game, mapf, i, j);
 			if (ret == -1)
 				break ;
+			else if (ret == 2)
+				return (1);
 			else if (ret != 1)
 				return (ret);
 			j++;

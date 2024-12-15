@@ -6,7 +6,7 @@
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:08:36 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/13 01:03:48 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/15 17:38:23 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int	*xpm_to_img(t_game *game, char *path)
 
 void	init_textures(t_game *game)
 {
-	game->textures = ft_calloc(5, sizeof * game->textures);
+	game->textures = malloc(sizeof(int *) * 4);
 	if (!game->textures)
 		clean_exit(game, err("Could not allocate memory", 1));
 	game->textures[0] = xpm_to_img(game, game->texture.north);

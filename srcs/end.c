@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exit.c                                             :+:      :+:    :+:   */
+/*   end.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:07:39 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/13 01:04:53 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/15 17:14:51 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,13 @@ void	free_texture(t_tex *textures)
 int	free_game(t_game *game)
 {
 	if (game->textures)
-		free_tab((void **)game->textures);
+	{
+		free(game->textures[0]);
+		free(game->textures[1]);
+		free(game->textures[2]);
+		free(game->textures[3]);
+		free(game->textures);
+	}
 	if (game->texture_pixels)
 		free_tab((void **)game->texture_pixels);
 	if (game->map.fd > 0)

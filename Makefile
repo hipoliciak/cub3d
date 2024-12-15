@@ -6,7 +6,7 @@
 #    By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/30 23:20:11 by dmodrzej          #+#    #+#              #
-#    Updated: 2024/12/12 23:33:22 by dmodrzej         ###   ########.fr        #
+#    Updated: 2024/12/15 17:41:53 by dmodrzej         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,12 +18,9 @@ FLAGS	=	-g -Wall -Wextra -Werror
 
 # sources
 SRC_DIR =	srcs/
-SRC		=	main.c check_file.c	check_map.c init_player.c \
-			exit.c set_color_textures.c parse_file.c \
-			init_data.c init_mlx.c init_textures.c \
-			read_file.c utils.c create_game_map.c \
-			player_move.c player_move_utils.c \
-			raycasting.c render.c texture.c
+SRC		=	main.c init_mlx.c init_game.c init_textures.c init_player.c read_file.c \
+			parse_file.c create_game_map.c check_input_file.c check_map.c color_textures_utils.c \
+			move_player.c raycasting.c render.c texture_utils.c end.c utils.c
 SRCS	=	$(addprefix $(SRC_DIR), $(SRC))
 
 # objects

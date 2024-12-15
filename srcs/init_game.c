@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init_data.c                                        :+:      :+:    :+:   */
+/*   init_game.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:08:15 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/13 01:04:53 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/15 17:24:27 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,22 +50,7 @@ void	init_map(t_map *map)
 	map->file = NULL;
 	map->height = 0;
 	map->width = 0;
-	map->index_end_of_map = 0;
-}
-
-void	init_player(t_player *player)
-{
-	player->dir = '\0';
-	player->pos_x = 0.0;
-	player->pos_y = 0.0;
-	player->dir_x = 0.0;
-	player->dir_y = 0.0;
-	player->plane_x = 0.0;
-	player->plane_y = 0.0;
-	player->has_moved = 0;
-	player->move_x = 0;
-	player->move_y = 0;
-	player->rotate = 0;
+	map->end_of_map = 0;
 }
 
 void	init_game(t_game *game)

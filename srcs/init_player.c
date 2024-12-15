@@ -6,7 +6,7 @@
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:09:37 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/13 01:04:53 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/15 01:07:09 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,8 +97,19 @@ void	init_player_east_west(t_player *player)
 		return ;
 }
 
-void	init_player_dir(t_game *game)
+void	init_player(t_player *player)
 {
-	init_player_north_south(&game->player);
-	init_player_east_west(&game->player);
+	player->dir = '\0';
+	player->pos_x = 0.0;
+	player->pos_y = 0.0;
+	player->dir_x = 0.0;
+	player->dir_y = 0.0;
+	player->plane_x = 0.0;
+	player->plane_y = 0.0;
+	player->key_state[0] = 0;
+	player->key_state[1] = 0;
+	player->key_state[2] = 0;
+	player->key_state[3] = 0;
+	player->key_state[4] = 0;
+	player->key_state[5] = 0;
 }

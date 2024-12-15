@@ -6,7 +6,7 @@
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:10:25 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/13 00:42:25 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/15 16:42:02 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,9 @@ void	render_frame(t_game *game)
 	int		y;
 
 	image.img = NULL;
+	init_texture_pixels(game);
+	init_ray(&game->ray);
+	raycasting(&game->player, game);
 	init_img(game, &image, game->win_width, game->win_height);
 	y = 0;
 	while (y < game->win_height)
@@ -53,22 +56,9 @@ void	render_frame(t_game *game)
 	mlx_destroy_image(game->mlx, image.img);
 }
 
-void	render_raycast(t_game *game)
+int	render_game(t_game *game)
 {
-	init_texture_pixels(game);
-	init_ray(&game->ray);
-	raycasting(&game->player, game);
+	move_player(game);
 	render_frame(game);
-}
-
-int	render(t_game *game)
-{
-	game->player.has_moved += move_player(game);
-	if (game->player.has_moved == 0)
-	{
-		render_frame(game);
-		return (0);
-	}
-	render_raycast(game);
 	return (0);
 }

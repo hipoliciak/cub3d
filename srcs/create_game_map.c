@@ -6,13 +6,13 @@
 /*   By: dmodrzej <dmodrzej@student.42warsaw.pl>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/10 21:07:16 by dmodrzej          #+#    #+#             */
-/*   Updated: 2024/12/13 01:04:53 by dmodrzej         ###   ########.fr       */
+/*   Updated: 2024/12/15 17:24:22 by dmodrzej         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static int	count_map_lines(t_game *game, char **file, int i)
+int	count_map_lines(t_game *game, char **file, int i)
 {
 	int	index_value;
 	int	j;
@@ -27,11 +27,11 @@ static int	count_map_lines(t_game *game, char **file, int i)
 			break ;
 		i++;
 	}
-	game->map.index_end_of_map = i;
+	game->map.end_of_map = i;
 	return (i - index_value);
 }
 
-static int	fill_mapf_tab(t_map *map, char **mapf_tab, int index)
+int	fill_mapf_tab(t_map *map, char **mapf_tab, int index)
 {
 	int		i;
 	int		j;
@@ -58,18 +58,7 @@ static int	fill_mapf_tab(t_map *map, char **mapf_tab, int index)
 	return (0);
 }
 
-static int	get_map_info(t_game *game, char **file, int i)
-{
-	game->map.height = count_map_lines(game, file, i);
-	game->mapf = malloc(sizeof(char *) * (game->map.height + 1));
-	if (!game->mapf)
-		return (err("Could not allocate memory", 1));
-	if (fill_mapf_tab(&game->map, game->mapf, i))
-		return (1);
-	return (0);
-}
-
-static void	change_space_into_wall(t_game *game)
+void	change_space_into_wall(t_game *game)
 {
 	int	i;
 	int	j;
@@ -88,6 +77,17 @@ static void	change_space_into_wall(t_game *game)
 		}
 		i++;
 	}
+}
+
+int	get_map_info(t_game *game, char **file, int i)
+{
+	game->map.height = count_map_lines(game, file, i);
+	game->mapf = malloc(sizeof(char *) * (game->map.height + 1));
+	if (!game->mapf)
+		return (err("Could not allocate memory", 1));
+	if (fill_mapf_tab(&game->map, game->mapf, i))
+		return (1);
+	return (0);
 }
 
 int	create_map(t_game *game, char **file, int i)
